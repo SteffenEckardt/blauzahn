@@ -1,77 +1,66 @@
 package com.geonet.blauzahn;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothClassicService;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothConfiguration;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothDeviceDecorator;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
+
+//import com.devpaul.bluetoothutillib.SimpleBluetooth;
 
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BluetoothService bluetoothService;
+    private static final int REQUEST_ENABLE_BT = 1;
+    private BluetoothAdapter bluetoothAdapter;
+    private DeviceListFragment deviceListFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BluetoothConfiguration config = new BluetoothConfiguration();
-        config.context = this;
-        config.bluetoothServiceClass = BluetoothClassicService.class; // BluetoothClassicService.class or BluetoothLeService.class
-        config.bufferSize = 1024;
-        config.characterDelimiter = '\n';
-        config.deviceName = "Your App Name";
-        config.callListenersInMainThread = true;
-        config.uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // Set null to find all devices on scan.
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            return;
+        }
 
-        BluetoothService.init(config);
-        bluetoothService = BluetoothService.getDefaultInstance();
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            return;
+        }
 
-        DeviceListFragment deviceListFragment = new DeviceListFragment();
-        deviceListFragment.setOnDeviceSelectedListener(device -> {
-            getSupportFragmentManager().beginTransaction().add(R.id.rootFrame, ChatFragment.createChatFragment(device), ChatFragment.TAG).commit();
-        });
-
-
-        // Set initial DeviceListFragment
-        getSupportFragmentManager().beginTransaction().add(R.id.rootFrame, deviceListFragment, DeviceListFragment.TAG).commit();
-
-        bluetoothService.setOnEventCallback(new BluetoothService.OnBluetoothEventCallback() {
-            @Override
-            public void onDataRead(byte[] bytes, int i) {
-
-            }
-
-            @Override
-            public void onStatusChange(BluetoothStatus bluetoothStatus) {
-                Log.d("@BT_MESSENGER", "onStatusChange: " + bluetoothStatus.toString());
-            }
-
-            @Override
-            public void onDeviceName(String s) {
-                Log.d("@BT_MESSENGER", "onDeviceName: " + s);
-            }
-
-            @Override
-            public void onToast(String s) {
-
-            }
-
-            @Override
-            public void onDataWrite(byte[] bytes) {
-
-            }
-        });
-
+        startLogic();
 
     }
 
 
+    void startLogic() {
+
+        deviceListFragment = DeviceListFragment.createDeviceListFragment(bluetoothAdapter);
+        deviceListFragment.setOnDeviceSelectedListener(device -> {
+
+
+
+        });
+
+        getSupportFragmentManager().beginTransaction().add(R.id.rootFrame, deviceListFragment, DeviceListFragment.TAG).addToBackStack(null).commit();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
+            startLogic();
+        }
+
+    }
 }

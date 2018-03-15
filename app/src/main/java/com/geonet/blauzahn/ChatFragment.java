@@ -1,5 +1,6 @@
 package com.geonet.blauzahn;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,30 +11,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothClassicService;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothConfiguration;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService;
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus;
 
 import java.util.UUID;
+
 
 /**
  * Created by SE on 14.03.2018.
  */
-public class ChatFragment extends Fragment implements BluetoothService.OnBluetoothEventCallback {
+
+
+public class ChatFragment extends Fragment {
 
     public static final String TAG = "CHAT";
     private BluetoothDevice targetDevice;
     private TextView textView;
+    private BluetoothAdapter bluetoothAdapter;
+
 
     public ChatFragment() {
     }
 
     @NonNull
-    public static ChatFragment createChatFragment(@NonNull BluetoothDevice targetDevice) {
+    public static ChatFragment createChatFragment(@NonNull BluetoothDevice targetDevice, @NonNull BluetoothAdapter bluetoothAdapter) {
 
         ChatFragment fragment = new ChatFragment();
         fragment.targetDevice = targetDevice;
+        fragment.bluetoothAdapter = bluetoothAdapter;
 
         return fragment;
     }
@@ -52,32 +55,9 @@ public class ChatFragment extends Fragment implements BluetoothService.OnBluetoo
     public void onStart() {
         super.onStart();
 
-        BluetoothService bluetoothService = BluetoothService.getDefaultInstance();
-        bluetoothService.setOnEventCallback(this);
-    }
+        boolean bond = targetDevice.createBond();
 
-    @Override
-    public void onDataRead(byte[] bytes, int i) {
 
-    }
-
-    @Override
-    public void onStatusChange(BluetoothStatus bluetoothStatus) {
-        textView.setText(bluetoothStatus.toString());
-    }
-
-    @Override
-    public void onDeviceName(String s) {
-        textView.setText(s);
-    }
-
-    @Override
-    public void onToast(String s) {
-
-    }
-
-    @Override
-    public void onDataWrite(byte[] bytes) {
 
     }
 }
