@@ -76,6 +76,7 @@ public class DeviceListFragment extends Fragment {
 
     /**
      * Creates a new instance of {@link DeviceListFragment}.
+     *
      * @param bluetoothAdapter {@link BluetoothAdapter} An active bluetooth adapter.
      * @return The new instance of {@link DeviceListFragment}.
      */
@@ -139,26 +140,23 @@ public class DeviceListFragment extends Fragment {
      */
     private void scanForDevices() {
 
-        // Check if discovery is already running
-        if (!bluetoothAdapter.isDiscovering()) {
+        // Remove all entries
+        devicesAdapter.clearList();
 
-            // Remove all entries
-            devicesAdapter.clearList();
+        // Start device discovery
+        bluetoothAdapter.startDiscovery();
 
-            // Start device discovery
-            bluetoothAdapter.startDiscovery();
-
-        }
     }
 
     /**
      * Tries to connect to a device.
+     *
      * @param device {@link BluetoothAdapter} The device to connect to.
      */
     void tryConnectToDevice(final BluetoothDevice device) {
 
         // If device is already bonded, call listener immediately
-        if(device.getBondState() == BluetoothDevice.BOND_BONDED) {
+        if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
             onDeviceSelectedListener.deviceSelected(device);
             return;
         }
@@ -171,6 +169,7 @@ public class DeviceListFragment extends Fragment {
 
     /**
      * Sets a listener to handle a device selection.
+     *
      * @param listener {@link OnDeviceSelectedListener}
      */
     void setOnDeviceSelectedListener(OnDeviceSelectedListener listener) {
@@ -182,6 +181,7 @@ public class DeviceListFragment extends Fragment {
 
         /**
          * Is called when the user wants to connect to a device.
+         *
          * @param device {@link BluetoothDevice}
          */
         void deviceSelected(BluetoothDevice device);
@@ -239,7 +239,12 @@ public class DeviceListFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
             final String name = bluetoothDeviceList.get(position).getName();
-            holder.getTextName().setText(!name.isEmpty() ? name : "n/a");
+
+            if (name != null && !name.equals("")) {
+                holder.getTextName().setText(name);
+            } else {
+                holder.getTextName().setText("n/a");
+            }
 
             holder.getRootView().setOnClickListener(view -> {
 
