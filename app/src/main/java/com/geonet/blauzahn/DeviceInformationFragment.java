@@ -40,9 +40,10 @@ public class DeviceInformationFragment extends Fragment {
     public DeviceInformationFragment() {
     }
 
-     /**
-     * @param targetDevice
-     * @return
+    /**
+     * Creates a new instance of {@link DeviceInformationFragment}.
+     * @param targetDevice {@link BluetoothDevice} The device to gater information about.
+     * @return The created instance.
      */
     @NonNull
     public static DeviceInformationFragment createInformationFragment(@NonNull BluetoothDevice targetDevice) {
