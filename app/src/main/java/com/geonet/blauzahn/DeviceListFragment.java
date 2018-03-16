@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,8 @@ public class DeviceListFragment extends Fragment {
                 // object and its info from the Intent.
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 devicesAdapter.addDevice(device);
+
+                Log.d(TAG, "onReceive: Device found");
             }
 
             // Device bonding changed
@@ -94,7 +97,7 @@ public class DeviceListFragment extends Fragment {
 
         // Register for broadcasts when a device is discovered.
         IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, discoveryFilter);
+        getActivity().registerReceiver(broadcastReceiver, discoveryFilter);
 
         // Register for broadcasts when the bonding state changes.
         IntentFilter bondingFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
@@ -240,7 +243,7 @@ public class DeviceListFragment extends Fragment {
 
             final String name = bluetoothDeviceList.get(position).getName();
 
-            if (name != null && !name.equals("")) {
+            if (name != null && !name.isEmpty()) {
                 holder.getTextName().setText(name);
             } else {
                 holder.getTextName().setText("n/a");
